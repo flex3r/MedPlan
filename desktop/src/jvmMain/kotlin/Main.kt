@@ -2,9 +2,11 @@ package com.flxrs.desktop
 
 import androidx.compose.foundation.LocalScrollbarStyle
 import androidx.compose.foundation.ScrollbarStyle
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -39,7 +41,7 @@ fun main() {
             title = "MedPlan",
         ) {
             MaterialTheme(
-                colors = lightColors() //if (isSystemInDarkTheme()) darkColors() else lightColors()
+                colors = if (isSystemInDarkTheme()) darkColors() else lightColors()
             ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
