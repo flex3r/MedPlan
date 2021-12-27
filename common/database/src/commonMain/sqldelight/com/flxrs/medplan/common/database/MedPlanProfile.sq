@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS ProfileEntity (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL
+);
+
+insertProfile:
+INSERT INTO ProfileEntity (name)
+VALUES (?);
+
+selectAll:
+SELECT *
+FROM ProfileEntity;
+
+getName:
+SELECT name
+FROM ProfileEntity
+WHERE id = :id;
+
+removeProfile:
+DELETE FROM ProfileEntity
+WHERE id = :id;
