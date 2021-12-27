@@ -3,6 +3,8 @@ package com.flxrs.medplan.common.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -86,44 +88,53 @@ fun MedPlanMainContent(component: MedPlanMain) {
                 }
             )
         }
+        Box(modifier = Modifier.fillMaxSize()) {
+            val scrollState = rememberScrollState()
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxSize()
+                    .verticalScroll(scrollState),
+                horizontalAlignment = Alignment.Start,
+            ) {
+                MedPlanTable(
+                    data = model.items,
+                    onClick = { column, item ->
+                        openDialog(column = column, item = item)
+                    },
+                    onDeleteClick = { component.onItemDeleteClicked(it.id) },
+                    headerCellContent = { HeaderCell(it) },
+                    cellContent = { idx, item ->
+                        ContentCell(idx, item) {
+                            val time = UsageTime.values()[idx - 1]
+                            val usage = Usage(time, amount = "")
+                            component.onItemUsageChanged(item.id, usage)
+                        }
+                    },
+                )
 
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.Start
-        ) {
-            MedPlanTable(
-                data = model.items,
-                onClick = { column, item ->
-                    openDialog(column = column, item = item)
-                },
-                onDeleteClick = { component.onItemDeleteClicked(it.id) },
-                headerCellContent = { HeaderCell(it) },
-                cellContent = { idx, item ->
-                    ContentCell(idx, item) {
-                        val time = UsageTime.values()[idx - 1]
-                        val usage = Usage(time, amount = "")
-                        component.onItemUsageChanged(item.id, usage)
-                    }
-                },
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                content = {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = null)
-                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                    Text(text = "Neues Medikament")
-                },
-                onClick = { openDialog(title = "Neues Medikament") }
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(
-                content = {
-                    Icon(imageVector = Icons.Default.Print, contentDescription = null)
-                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                    Text(text = "Drucken")
-                },
-                onClick = component::onPrintClicked
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    content = {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = null)
+                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                        Text(text = "Neues Medikament")
+                    },
+                    onClick = { openDialog(title = "Neues Medikament") }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    content = {
+                        Icon(imageVector = Icons.Default.Print, contentDescription = null)
+                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                        Text(text = "Drucken")
+                    },
+                    onClick = component::onPrintClicked
+                )
+            }
+            Scrollbar(
+                modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                state = scrollState,
             )
         }
     }
@@ -142,7 +153,7 @@ fun MedPlanTable(
     Surface(modifier = modifier.padding(16.dp)) {
         Row {
             (0 until columnCount).forEach { columnIndex ->
-                Column(modifier = Modifier.weight(1f)) {
+                Column(modifier = Modifier.weight(weight = if (columnIndex == 0) 2f else 1f)) {
                     (0..data.size).forEach { index ->
                         Surface(
                             border = BorderStroke(1.dp, MaterialTheme.colors.onSurface),
@@ -204,12 +215,15 @@ private fun ContentCell(index: Int, item: MedPlanMainItem, onClearClick: () -> U
         0    -> item.name
         else -> item.findByColumn(index)?.amount.orEmpty()
     }
-    Row(modifier = Modifier.heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier.heightIn(min = 48.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Text(
             text = value,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
-            maxLines = 1,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
         if (index > 0 && value.isNotBlank()) {

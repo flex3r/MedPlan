@@ -17,7 +17,9 @@ internal actual suspend fun createPdfWithTablePlatform(rowsAndColumns: List<List
     runCatching {
         val doc = PDDocument()
         val columns = rowsAndColumns.firstOrNull()?.size ?: return@withContext
-        val columnsOfWidth = List(columns) { 100f }.toFloatArray()
+        val columnsOfWidth = Array(columns) {
+            if (it == 0) 250f else 75f
+        }.toFloatArray()
 
         val page = PDPage(PDRectangle(PDRectangle.A4.height, PDRectangle.A4.width)).also {
             doc.addPage(it)
@@ -25,13 +27,13 @@ internal actual suspend fun createPdfWithTablePlatform(rowsAndColumns: List<List
 
         val initialTable = Table.builder()
             .addColumnsOfWidth(*columnsOfWidth)
-            .padding(2f)
+            .padding(4f)
 
         val table = rowsAndColumns.fold(initialTable) { table, rowContent ->
             val row = rowContent.fold(Row.builder()) { row, columnContent ->
                 row.add(TextCell.builder().text(columnContent).borderWidth(1f).build())
             }
-            table.addRow(row.build())
+            table.addRow(row.padding(4f).build())
         }.build()
 
         PDPageContentStream(doc, page).use { contentStream ->
