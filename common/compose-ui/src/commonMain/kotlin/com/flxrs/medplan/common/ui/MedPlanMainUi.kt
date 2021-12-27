@@ -5,7 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,18 +46,21 @@ fun MedPlanMainContent(component: MedPlanMain) {
         )
     }
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        TopAppBar(
-            title = { Text(text = "MedPlan - ${model.profile}") },
-            navigationIcon = {
-                IconButton(onClick = component::onBackClicked) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = null,
-                    )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "MedPlan - ${model.profile}") },
+                navigationIcon = {
+                    IconButton(onClick = component::onBackClicked) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = null,
+                        )
+                    }
                 }
-            }
-        )
+            )
+        }
+    ) {
 
         if (dialogState.isOpen) {
             EditDialog(
@@ -113,7 +119,7 @@ fun MedPlanMainContent(component: MedPlanMain) {
             Spacer(modifier = Modifier.height(8.dp))
             Button(
                 content = {
-                    Icon(imageVector = Icons.Default.Email, contentDescription = null)
+                    Icon(imageVector = Icons.Default.Print, contentDescription = null)
                     Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                     Text(text = "Drucken")
                 },

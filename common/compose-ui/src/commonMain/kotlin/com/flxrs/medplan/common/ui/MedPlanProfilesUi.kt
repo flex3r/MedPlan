@@ -16,11 +16,9 @@ import com.flxrs.medplan.common.profiles.MedPlanProfiles
 fun MedPlanProfilesContent(component: MedPlanProfiles) {
     val model by component.models.subscribeAsState()
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Scaffold(topBar = { TopAppBar(title = { Text(text = "MedPlan") }) }) {
         var dialogOpen by remember { mutableStateOf(false) }
         var dialogText by remember { mutableStateOf("") }
-
-        TopAppBar(title = { Text(text = "MedPlan") })
 
         if (dialogOpen) {
             EditDialog(
@@ -39,7 +37,9 @@ fun MedPlanProfilesContent(component: MedPlanProfiles) {
         ) {
             model.profiles.forEach { item ->
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     OutlinedButton(
@@ -55,7 +55,10 @@ fun MedPlanProfilesContent(component: MedPlanProfiles) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            if (model.profiles.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
             Button(
                 content = {
                     Icon(imageVector = Icons.Default.Add, contentDescription = null)
