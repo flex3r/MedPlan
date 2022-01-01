@@ -8,6 +8,7 @@ import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.flxrs.medplan.common.profiles.MedPlanProfilesItem
 import com.flxrs.medplan.common.profiles.store.MedPlanProfilesStore.Intent
 import com.flxrs.medplan.common.profiles.store.MedPlanProfilesStore.State
+import com.flxrs.medplan.common.utils.replace
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
@@ -30,6 +31,7 @@ internal class MedPlanProfilesStoreProvider(
     private sealed class Result {
         data class ProfilesLoaded(val items: List<MedPlanProfilesItem>) : Result()
         data class ProfileDeleted(val id: Long) : Result()
+        data class ProfileNameChanged(val id: Long, val name: String) : Result()
         object ProfileAdded : Result()
     }
 
@@ -47,6 +49,7 @@ internal class MedPlanProfilesStoreProvider(
             when (intent) {
                 is Intent.AddProfile    -> addProfile(intent.name)
                 is Intent.DeleteProfile -> deleteProfile(intent.id)
+                is Intent.UpdateProfile -> updateProfile(intent.id, intent.name)
             }
 
         private fun addProfile(name: String) {
@@ -65,20 +68,35 @@ internal class MedPlanProfilesStoreProvider(
             }
         }
 
+        private fun updateProfile(id: Long, name: String) {
+            dispatch(Result.ProfileNameChanged(id, name))
+            scope.launch {
+                database.updateProfile(id, name)
+            }
+        }
+
     }
 
     private object ReducerImpl : Reducer<State, Result> {
         override fun State.reduce(result: Result): State =
             when (result) {
-                is Result.ProfilesLoaded -> copy(items = result.items)
-                is Result.ProfileDeleted -> copy(items = items.filterNot { it.profileId == result.id })
-                is Result.ProfileAdded   -> this
+                is Result.ProfilesLoaded     -> copy(items = result.items)
+                is Result.ProfileDeleted     -> copy(items = items.filterNot { it.profileId == result.id })
+                is Result.ProfileAdded       -> this
+                is Result.ProfileNameChanged -> update(id = result.id) { copy(name = result.name) }
             }
+
+        private inline fun State.update(id: Long, block: MedPlanProfilesItem.() -> MedPlanProfilesItem): State {
+            val profile = items.find { it.profileId == id } ?: return this
+
+            return copy(items = items.replace(profile.block(), MedPlanProfilesItem::profileId))
+        }
     }
 
     interface Database {
         fun observeProfiles(): Flow<List<MedPlanProfilesItem>>
         suspend fun addProfile(name: String)
         suspend fun deleteProfile(id: Long)
+        suspend fun updateProfile(id: Long, name: String)
     }
 }

@@ -12,6 +12,8 @@ interface MedPlanProfiles {
 
     fun onDeleteProfileClicked(id: Long)
 
+    fun onUpdateProfileClicked(id: Long, name: String)
+
     data class Model(
         val profiles: List<MedPlanProfilesItem>
     )

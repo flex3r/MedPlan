@@ -19,3 +19,8 @@ WHERE id = :id;
 removeProfile:
 DELETE FROM ProfileEntity
 WHERE id = :id;
+
+updateProfile:
+UPDATE ProfileEntity
+SET name = :name
+WHERE id = :id;

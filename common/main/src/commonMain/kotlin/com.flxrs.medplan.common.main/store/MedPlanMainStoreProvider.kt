@@ -107,8 +107,9 @@ internal class MedPlanMainStoreProvider(
                     }
                 }
 
+                val title = "Medikamentenplan - ${state.profile}"
                 val total = listOf(headerContent) + content
-                PdfCreator.createPdfWithTable(total)
+                PdfCreator.createPdfWithTable(title, total)
             }
         }
     }
@@ -126,10 +127,10 @@ internal class MedPlanMainStoreProvider(
                 }
             }
 
-        private inline fun State.update(id: Long, func: MedPlanMainItem.() -> MedPlanMainItem): State {
+        private inline fun State.update(id: Long, block: MedPlanMainItem.() -> MedPlanMainItem): State {
             val item = items.find { it.id == id } ?: return this
 
-            return copy(items = items.replace(item.func(), MedPlanMainItem::id))
+            return copy(items = items.replace(item.block(), MedPlanMainItem::id))
         }
     }
 

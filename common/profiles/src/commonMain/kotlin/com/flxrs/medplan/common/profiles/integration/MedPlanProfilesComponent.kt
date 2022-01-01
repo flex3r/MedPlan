@@ -40,4 +40,8 @@ class MedPlanProfilesComponent(
     override fun onProfileClicked(id: Long) {
         output(Output.ProfileSelected(profileId = id))
     }
+
+    override fun onUpdateProfileClicked(id: Long, name: String) {
+        store.accept(Intent.UpdateProfile(id = id, name = name))
+    }
 }

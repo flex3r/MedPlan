@@ -21,6 +21,10 @@ internal class MedPlanProfilesStoreDatabase(
     override suspend fun deleteProfile(id: Long) =
         database.deleteProfile(id)
 
+    override suspend fun updateProfile(id: Long, name: String) {
+        database.updateProfile(id, name)
+    }
+
     private fun List<ProfileEntity>.toProfiles(): List<MedPlanProfilesItem> =
         map {
             MedPlanProfilesItem(

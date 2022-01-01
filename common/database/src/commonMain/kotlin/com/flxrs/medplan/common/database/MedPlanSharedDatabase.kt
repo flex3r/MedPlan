@@ -46,6 +46,10 @@ class MedPlanSharedDatabase(driver: SqlDriver) {
         database.medPlanProfileQueries.getName(id).executeAsOne()
     }
 
+    suspend fun updateProfile(id: Long, name: String) = withContext(Dispatchers.Default) {
+        database.medPlanProfileQueries.updateProfile(name, id)
+    }
+
     fun observeItems(profileId: Long): Flow<List<ItemEntity>> =
         database.medPlanItemQueries
             .getItemsForProfile(profileId)
